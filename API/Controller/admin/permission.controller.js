@@ -96,3 +96,13 @@ module.exports.update = async (req, res) => {
         res.json({ msg: "Bạn đã update thành công" })
     }
 }
+
+// Thêm API endpoint để lấy danh sách quyền
+module.exports.getPermissions = async (req, res) => {
+    try {
+        const permissions = await Permission.find();
+        res.json({ permissions });
+    } catch (error) {
+        res.status(500).json({ msg: "Lỗi server" });
+    }
+}

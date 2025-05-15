@@ -102,51 +102,25 @@ module.exports.post_momo = async (req, res) => {
 
 }
 
+// Giả sử đây là hàm xử lý tạo đơn hàng
+module.exports.create = async (req, res) => {
+    // Code xử lý tạo đơn hàng hiện tại...
+    
+    // Sau khi tạo đơn hàng thành công, cập nhật số lượng sản phẩm
+    const products = req.body.products; // Giả sử đây là danh sách sản phẩm trong đơn hàng
+    
+    for (let item of products) {
+        const product = await Product.findById(item.id_product);
+        if (product) {
+            product.number = Math.max(0, product.number - item.count);
+            await product.save();
+        }
+    }
+    
+    // Phần code còn lại...
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- module.exports.post_paypal = async (req, res) => {
+module.exports.post_paypal = async (req, res) => {
 
      var create_payment_json = {
          "intent": "authorize",

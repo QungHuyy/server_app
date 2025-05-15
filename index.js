@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express')
 const app = express()
 const http = require('http').Server(app);
@@ -7,8 +9,6 @@ const cors = require("cors");
 
 // Khởi tạo paypal
 var paypal = require('paypal-rest-sdk');
-
-// const io = require('socket.io')(http);
 
 var upload = require('express-fileupload');
 const port = 8000
@@ -28,13 +28,27 @@ const UserAdmin = require('./API/Router/admin/user.router')
 const Order = require('./API/Router/admin/order.router')
 const Coupon = require('./API/Router/admin/coupon.router')
 const Sale = require('./API/Router/admin/sale.router')
+const CommentAdmin = require('./API/Router/admin/comment.router')
 
 const mongoose = require("mongoose");
 mongoose.connect("mongodb+srv://admin:admin@app.sj5nx.mongodb.net/?retryWrites=true&w=majority&appName=app", {
   useNewUrlParser: true,
   useUnifiedTopology: true
-}).then(() => {
-  console.log('Connected to database ')
+}).then(async () => {
+  console.log('Connected to database ');
+  
+  // Tự động tạo quyền Admin nếu chưa tồn tại
+  try {
+    const Permission = require('./Models/permission');
+    const adminPermission = await Permission.findOne({ permission: 'Admin' });
+    if (!adminPermission) {
+      const newAdminPermission = new Permission({ permission: 'Admin' });
+      await newAdminPermission.save();
+      console.log('Created Admin permission');
+    }
+  } catch (error) {
+    console.error('Error creating Admin permission:', error);
+  }
 })
   .catch((err) => {
     console.error(`Error connecting to the database. \n${err}`);
@@ -72,6 +86,7 @@ app.use('/api/admin/user', UserAdmin)
 app.use('/api/admin/Order', Order)
 app.use('/api/admin/Coupon', Coupon)
 app.use('/api/admin/Sale', Sale)
+app.use('/api/admin/comment', CommentAdmin)
 
 
 io.on("connection", (socket) => {

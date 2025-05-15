@@ -2,13 +2,20 @@ var mongoose = require('mongoose');
 
 var schema = new mongoose.Schema(
     {
-        id_product: String,
+        id_product: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Product'
+        },
         id_user: {
-            type: String,
+            type: mongoose.Schema.Types.ObjectId,
             ref: 'Users'
         },
         content: String,
         star: Number,
+        created_at: {
+            type: Date,
+            default: Date.now
+        }
     }
 );
 

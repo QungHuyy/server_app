@@ -7,6 +7,7 @@ const Permission = require('../../Controller/admin/permission.controller')
 router.get('/', Permission.index)
 router.get('/all', Permission.all)
 router.get('/:id', Permission.details)
+router.get('/list', Permission.getPermissions)
 
 router.post('/create', Permission.create)
 

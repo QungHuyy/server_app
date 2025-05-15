@@ -11,6 +11,7 @@ module.exports.index = async (req, res) => {
     let start = (page - 1) * perPage;
     let end = page * perPage;
 
+    // Thêm populate để lấy thông tin sản phẩm
     const sale = await Sale.find().populate('id_product');
 
     if (!keyWordSearch) {
@@ -103,5 +104,17 @@ module.exports.detailList = async (req, res) => {
         res.json({
             msg: "That Bai"
         })
+    }
+}
+
+module.exports.delete = async (req, res) => {
+    try {
+        const id = req.params.id;
+        
+        await Sale.deleteOne({ _id: id });
+        
+        res.json({ msg: "Thanh Cong" });
+    } catch (error) {
+        res.status(500).json({ msg: "That Bai", error: error.message });
     }
 }
