@@ -74,6 +74,8 @@ module.exports.update = async (req, res) => {
     sale.describe = req.body.describe
     sale.status = req.body.status
     sale.id_product = req.body.id_product
+    sale.start = req.body.start
+    sale.end = req.body.end
 
     sale.save()
 
