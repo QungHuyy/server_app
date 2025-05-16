@@ -2,6 +2,8 @@ const Order = require('../../../Models/order')
 const Detail_History = require('../../../Models/detail_order')
 const Payment = require('../../../Models/payment')
 const Delivery = require('../../../Models/delivery')
+const Products = require("../../../Models/product")
+const Detail_Order = require("../../../Models/detail_order")
 
 module.exports.index = async (req, res) => {
     let page = parseInt(req.query.page) || 1;
@@ -83,12 +85,56 @@ module.exports.confirmOrder = async (req, res) => {
     res.json({ msg: "Thanh Cong" })
 }
 
+// module.exports.delivery = async (req, res) => {
+//     await Order.updateOne({ _id: req.query.id }, { status: "3" },async function (err, res) {
+      
+        
+//         const DetailOrder = await Detail_Order.findOne({id_order: req.query.id}) 
+//         const  inventory= DetailOrder.inventory
+//        console.log(inventory);
+       
+
+//         if (err) return res.json({ msg: err });
+//     });
+  
+//     res.json({ msg: "Thanh Cong" })
+// }
 module.exports.delivery = async (req, res) => {
-    await Order.updateOne({ _id: req.query.id }, { status: "3" }, function (err, res) {
-        if (err) return res.json({ msg: err });
-    });
-    res.json({ msg: "Thanh Cong" })
-}
+  try {
+    // Cập nhật trạng thái đơn hàng
+    await Order.updateOne({ _id: req.query.id }, { status: "3" });
+
+    // Lấy chi tiết đơn hàng
+    const detailOrder = await Detail_Order.findOne({ id_order: req.query.id });
+    const detailInventory = detailOrder.inventory; // ví dụ: { S: 1 }
+    const id_product = detailOrder.id_product;
+
+    // Lấy sản phẩm tương ứng
+    const product = await Products.findOne({ _id: id_product });
+    if (!product) return res.status(404).json({ msg: "Không tìm thấy sản phẩm" });
+
+    const productInventory = product.inventory; // ví dụ: { S: 1, M: 2, L: 1 }
+
+    // Chỉ cập nhật size nào có trong detailOrder.inventory
+    for (const size in detailInventory) {
+      if (productInventory[size] !== undefined) {
+        productInventory[size] -= detailInventory[size];
+        if (productInventory[size] < 0) productInventory[size] = 0; // không để số âm
+      }
+    }
+
+    // Cập nhật lại inventory
+    await Products.updateOne(
+      { _id: id_product },
+      { inventory: productInventory }
+    );
+
+    res.json({ msg: "Thanh Cong" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: "Lỗi server" });
+  }
+};
 
 module.exports.confirmDelivery = async (req, res) => {
     await Order.updateOne({ _id: req.query.id }, { status: "4", pay: true }, function (err, res) {

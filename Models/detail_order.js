@@ -13,7 +13,12 @@ var schema = new mongoose.Schema(
         name_product: String,
         price_product: String,
         count: Number,
-        size: String
+        size: String,
+        inventory: {
+            S:  Number ,
+            M:  Number ,
+            L:  Number 
+        },
     }
 );
 
