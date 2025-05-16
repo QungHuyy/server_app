@@ -11,7 +11,14 @@ var schema = new mongoose.Schema(
         image: String,
         describe: String,
         gender: String,
-        number: Number, // Thêm trường số lượng
+        // Thay đổi từ number thành inventory để quản lý số lượng theo size
+        inventory: {
+            S: { type: Number, default: 0 },
+            M: { type: Number, default: 0 },
+            L: { type: Number, default: 0 }
+        },
+        // Giữ lại trường number để tương thích ngược
+        number: Number
     }
 );
 

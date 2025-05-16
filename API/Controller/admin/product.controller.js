@@ -49,19 +49,27 @@ module.exports.create = async (req, res) => {
         newProduct.name_product = req.body.name
         newProduct.price_product = req.body.price
         newProduct.id_category = req.body.category
-        newProduct.number = req.body.number // Bỏ comment để lưu số lượng Product
+        
+        // Xử lý số lượng theo size
+        newProduct.inventory = {
+            S: parseInt(req.body.inventoryS) || 0,
+            M: parseInt(req.body.inventoryM) || 0,
+            L: parseInt(req.body.inventoryL) || 0
+        }
+        
+        // Tính tổng số lượng để tương thích ngược
+        newProduct.number = (parseInt(req.body.inventoryS) || 0) + 
+                           (parseInt(req.body.inventoryM) || 0) + 
+                           (parseInt(req.body.inventoryL) || 0);
+                           
         newProduct.describe = req.body.description
         newProduct.gender = req.body.gender
 
         if (req.files) {
             var fileImage = req.files.file;
-
             var fileName = fileImage.name
-
             var fileProduct = "/img/" + fileName
-
             newProduct.image = "http://localhost:8000" + fileProduct
-
             fileImage.mv('./public/img/' + fileName)
         }
         else newProduct.image = 'http://localhost:8000/img/nophoto.jpg'
@@ -102,20 +110,26 @@ module.exports.update = async (req, res) => {
     } else {
         req.body.name = req.body.name.toLowerCase().replace(/^.|\s\S/g, a => { return a.toUpperCase() })
 
+        // Tính tổng số lượng để tương thích ngược
+        const totalInventory = (parseInt(req.body.inventoryS) || 0) + 
+                              (parseInt(req.body.inventoryM) || 0) + 
+                              (parseInt(req.body.inventoryL) || 0);
 
         if (req.files) {
             var fileImage = req.files.file;
-
             var fileName = fileImage.name
-
-
             var fileProduct = "/img/" + fileName
 
             await Product.updateOne({ _id: req.body.id }, {
                 name_product: req.body.name,
                 price_product: req.body.price,
                 id_category: req.body.category,
-                number: req.body.number, // Bỏ comment để cập nhật số lượng Product
+                inventory: {
+                    S: parseInt(req.body.inventoryS) || 0,
+                    M: parseInt(req.body.inventoryM) || 0,
+                    L: parseInt(req.body.inventoryL) || 0
+                },
+                number: totalInventory, // Cập nhật tổng số lượng
                 describe: req.body.description,
                 gender: req.body.gender,
                 image: fileProduct
@@ -131,7 +145,12 @@ module.exports.update = async (req, res) => {
                 name_product: req.body.name,
                 price_product: req.body.price,
                 id_category: req.body.category,
-                number: req.body.number, // Bỏ comment để cập nhật số lượng Product
+                inventory: {
+                    S: parseInt(req.body.inventoryS) || 0,
+                    M: parseInt(req.body.inventoryM) || 0,
+                    L: parseInt(req.body.inventoryL) || 0
+                },
+                number: totalInventory, // Cập nhật tổng số lượng
                 describe: req.body.description,
                 gender: req.body.gender
             }, function (err, res) {
@@ -139,7 +158,5 @@ module.exports.update = async (req, res) => {
             });
             res.json({ msg: "Bạn đã update thành công" })
         }
-
-
     }
 }

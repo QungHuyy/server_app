@@ -23,18 +23,24 @@ module.exports.gender = async (req, res) => {
 
 //TH: Hàm này dùng để phân loại Product
 module.exports.category = async (req, res) => {
-
-    const id_category = req.query.id_category
-
-    let products_category
-
-    if (id_category === 'all'){
-        products_category = await Products.find()
-    }else{
-        products_category = await Products.find({ id_category: id_category })
+    const id_category = req.query.id_category;
+    const gender = req.query.gender;
+    
+    let query = {};
+    
+    if (id_category !== 'all') {
+        query.id_category = id_category;
     }
     
-    res.json(products_category)
+    if (gender) {
+        if (gender.toLowerCase() === 'male' || gender.toLowerCase() === 'female' || gender.toLowerCase() === 'unisex') {
+            query.gender = { $regex: new RegExp('^' + gender + '$', 'i') };
+        }
+    }
+    
+    const products_category = await Products.find(query);
+    
+    res.json(products_category);
 }
 
 //TH: Chi Tiết Product
@@ -51,48 +57,39 @@ module.exports.detail = async (req, res) => {
 
 // QT: Tìm kiếm phân loại và phân trang Product
 module.exports.pagination = async (req, res) => {
-
-    //Lấy page từ query
-    const page = parseInt(req.query.page) || 1
-
-    //Lấy số lượng từ query
-    const numberProduct = parseInt(req.query.count) || 1
-
-    //Lấy key search từ query
-    const keyWordSearch = req.query.search
-
-    //Lấy category từ query
-    const category = req.query.category
-
-    //Lấy Product đầu và sẩn phẩm cuối
-    var start = (page - 1) * numberProduct
-    var end = page * numberProduct
-
-    var products
-
-    //Phân loại điều kiện category từ client gửi lên
-    if (category === 'all'){
-        products = await Products.find()
-    }else{
-        products = await Products.find({ id_category: category })
+    const page = parseInt(req.query.page) || 1;
+    const count = parseInt(req.query.count) || 9;
+    const search = req.query.search || '';
+    const category = req.query.category;
+    const gender = req.query.gender;
+    
+    console.log("Received query params:", { page, count, search, category, gender });
+    
+    let query = {};
+    
+    if (category !== 'all') {
+        query.id_category = category;
     }
-
-    var paginationProducts = products.slice(start, end)
-
-
-    if (!keyWordSearch){
-        
-        res.json(paginationProducts)
-
-    }else{
-        var newData = paginationProducts.filter(value => {
-            return value.name_product.toUpperCase().indexOf(keyWordSearch.toUpperCase()) !== -1 ||
-            value.price_product.toUpperCase().indexOf(keyWordSearch.toUpperCase()) !== -1
-        })
-
-        res.json(newData)
+    
+    if (gender) {
+        if (gender.toLowerCase() === 'male' || gender.toLowerCase() === 'female' || gender.toLowerCase() === 'unisex') {
+            query.gender = { $regex: new RegExp('^' + gender + '$', 'i') };
+        }
     }
-
+    
+    if (search) {
+        query.name_product = { $regex: search, $options: 'i' };
+    }
+    
+    console.log("Final query:", query);
+    
+    const products = await Products.find(query)
+        .skip((page - 1) * count)
+        .limit(count);
+    
+    console.log("Found products count:", products.length);
+    
+    res.json(products);
 }
 
 // Hàm này dùng để hiện những Product search theo scoll ở component tìm kiếm bên client
