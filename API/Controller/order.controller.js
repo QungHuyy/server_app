@@ -21,7 +21,7 @@ module.exports.send_mail = async (req, res) => {
 
     //B3: Bắt đầu gửi Mail xác nhận đơn hàng
     const htmlHead = '<table style="width:50%">' +
-        '<tr style="border: 1px solid black;"><th style="border: 1px solid black;">Tên Sản Phẩm</th><th style="border: 1px solid black;">Hình Ảnh</th><th style="border: 1px solid black;">Giá</th><th style="border: 1px solid black;">Số Lượng</th><th style="border: 1px solid black;">Size</th><th style="border: 1px solid black;">Thành Tiền</th>'
+        '<tr style="border: 1px solid black;"><th style="border: 1px solid black;">Tên Product</th><th style="border: 1px solid black;">Hình Ảnh</th><th style="border: 1px solid black;">Giá</th><th style="border: 1px solid black;">Số Lượng</th><th style="border: 1px solid black;">Size</th><th style="border: 1px solid black;">Thành Tiền</th>'
 
     let htmlContent = ""
 
@@ -106,8 +106,8 @@ module.exports.post_momo = async (req, res) => {
 module.exports.create = async (req, res) => {
     // Code xử lý tạo đơn hàng hiện tại...
     
-    // Sau khi tạo đơn hàng thành công, cập nhật số lượng sản phẩm
-    const products = req.body.products; // Giả sử đây là danh sách sản phẩm trong đơn hàng
+    // Sau khi tạo đơn hàng thành công, cập nhật số lượng Product
+    const products = req.body.products; // Giả sử đây là danh sách Product trong đơn hàng
     
     for (let item of products) {
         const product = await Product.findById(item.id_product);
@@ -134,8 +134,8 @@ module.exports.post_paypal = async (req, res) => {
          "transactions": [{
              "item_list": {
                  "items": [{
-                     "name": "item", // Tên sản phẩm
-                     "sku": "item", // mã sản phẩm
+                     "name": "item", // Tên Product
+                     "sku": "item", // mã Product
                      "price": "1.00", // giá tiền
                      "currency": "USD",
                      "quantity": 1 // số lượng

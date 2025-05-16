@@ -21,7 +21,7 @@ module.exports.gender = async (req, res) => {
 
 }
 
-//TH: Hàm này dùng để phân loại sản phẩm
+//TH: Hàm này dùng để phân loại Product
 module.exports.category = async (req, res) => {
 
     const id_category = req.query.id_category
@@ -37,7 +37,7 @@ module.exports.category = async (req, res) => {
     res.json(products_category)
 }
 
-//TH: Chi Tiết Sản Phẩm
+//TH: Chi Tiết Product
 module.exports.detail = async (req, res) => {
 
     const id = req.params.id
@@ -49,7 +49,7 @@ module.exports.detail = async (req, res) => {
 }
 
 
-// QT: Tìm kiếm phân loại và phân trang sản phẩm
+// QT: Tìm kiếm phân loại và phân trang Product
 module.exports.pagination = async (req, res) => {
 
     //Lấy page từ query
@@ -64,7 +64,7 @@ module.exports.pagination = async (req, res) => {
     //Lấy category từ query
     const category = req.query.category
 
-    //Lấy sản phẩm đầu và sẩn phẩm cuối
+    //Lấy Product đầu và sẩn phẩm cuối
     var start = (page - 1) * numberProduct
     var end = page * numberProduct
 
@@ -95,7 +95,7 @@ module.exports.pagination = async (req, res) => {
 
 }
 
-// Hàm này dùng để hiện những sản phẩm search theo scoll ở component tìm kiếm bên client
+// Hàm này dùng để hiện những Product search theo scoll ở component tìm kiếm bên client
 module.exports.scoll = async (req, res) => {
 
     const page = req.query.page
@@ -104,7 +104,7 @@ module.exports.scoll = async (req, res) => {
 
     const search = req.query.search
 
-    //Lấy sản phẩm đầu và sẩn phẩm cuối
+    //Lấy Product đầu và sẩn phẩm cuối
     const start = (page - 1) * count
     const end = page * count   
 

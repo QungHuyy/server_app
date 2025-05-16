@@ -23,7 +23,7 @@ module.exports.index = async (req, res) => {
         let start = (page - 1) * perPage;
         let end = page * perPage;
         
-        // Lấy danh sách người dùng
+        // Lấy danh sách User
         let users = await User.find(findCondition).populate('id_permission');
         
         // Xử lý tìm kiếm
@@ -40,7 +40,7 @@ module.exports.index = async (req, res) => {
             totalPage: totalPage
         });
     } catch (error) {
-        console.error("Lỗi khi lấy danh sách người dùng:", error);
+        console.error("Lỗi khi lấy danh sách User:", error);
         res.status(500).json({ msg: "Lỗi server" });
     }
 }
@@ -65,7 +65,7 @@ module.exports.create = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        // Tạo mới người dùng
+        // Tạo mới User
         const newUser = new User({
             email,
             password: hashedPassword,
@@ -74,13 +74,13 @@ module.exports.create = async (req, res) => {
             id_permission: permission
         });
 
-        // Lưu người dùng vào cơ sở dữ liệu
+        // Lưu User vào cơ sở dữ liệu
         const savedUser = await newUser.save();
 
         // Tạo token JWT
         const token = jwt.sign({ userId: savedUser._id }, 'gfdgfd', { expiresIn: '1h' });
 
-        // Trả về thông tin người dùng và token
+        // Trả về thông tin User và token
         res.json({
             msg: "Đăng ký thành công",
             user: savedUser,
@@ -96,7 +96,7 @@ module.exports.delete = async (req, res) => {
         const id = req.query.id;
         
         if (!id) {
-            return res.status(400).json({ msg: "Thiếu ID người dùng" });
+            return res.status(400).json({ msg: "Thiếu ID User" });
         }
 
         const result = await User.deleteOne({ _id: id });
@@ -104,10 +104,10 @@ module.exports.delete = async (req, res) => {
         if (result.deletedCount > 0) {
             return res.json({ msg: "Thanh Cong" });
         } else {
-            return res.status(404).json({ msg: "Không tìm thấy người dùng" });
+            return res.status(404).json({ msg: "Không tìm thấy User" });
         }
     } catch (error) {
-        console.error("Lỗi khi xóa người dùng:", error);
+        console.error("Lỗi khi Delete User:", error);
         return res.status(500).json({ msg: "Lỗi server" });
     }
 }
@@ -153,11 +153,11 @@ module.exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // Kiểm tra xem người dùng có tồn tại không
+        // Kiểm tra xem User có tồn tại không
         const user = await User.findOne({ email: email });
 
         if (!user) {
-            return res.json({ msg: "Không tìm thấy người dùng" });
+            return res.json({ msg: "Không tìm thấy User" });
         }
 
         // So sánh mật khẩu đã nhập với mật khẩu trong cơ sở dữ liệu
@@ -169,7 +169,7 @@ module.exports.login = async (req, res) => {
         // Tạo token JWT
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET || 'gfdgfd', { expiresIn: '1h' });
 
-        // Trả về phản hồi thành công với thông tin người dùng và token
+        // Trả về phản hồi thành công với thông tin User và token
         res.json({
             msg: "Đăng nhập thành công",
             user: {

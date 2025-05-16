@@ -5,7 +5,7 @@ const Order = require('../../Models/order')
 const Detail_Order = require('../../Models/detail_order')
 const mongoose = require('mongoose');
 
-// Gọi API hiện thị list comment của sản phẩm 
+// Gọi API hiện thị list comment của Product 
 // Phương thức GET
 module.exports.index = async (req, res) => {
     const id_product = req.params.id
@@ -13,7 +13,7 @@ module.exports.index = async (req, res) => {
     res.json(comment_product)
 }
 
-// Kiểm tra người dùng có thể đánh giá sản phẩm hay không
+// Kiểm tra User có thể Rating Product hay không
 // Phương thức GET
 module.exports.check_can_review = async (req, res) => {
     try {
@@ -31,7 +31,7 @@ module.exports.check_can_review = async (req, res) => {
             });
         }
         
-        // Kiểm tra xem người dùng đã đánh giá sản phẩm này chưa
+        // Kiểm tra xem User đã Rating Product này chưa
         const existingComment = await Comment.findOne({ 
             id_product: id_product,
             id_user: id_user
@@ -42,11 +42,11 @@ module.exports.check_can_review = async (req, res) => {
         if (existingComment) {
             return res.json({ 
                 canReview: false, 
-                message: "Bạn đã đánh giá sản phẩm này rồi" 
+                message: "Bạn đã Rating Product này rồi" 
             })
         }
 
-        // Tìm tất cả đơn hàng đã hoàn thành của người dùng (status = 4 là đã hoàn thành)
+        // Tìm tất cả đơn hàng đã hoàn thành của User (status = 4 là đã hoàn thành)
         const completedOrders = await Order.find({ 
             id_user: id_user,
             status: "4"  // Chỉ lấy đơn hàng có status = 4 (Hoàn thành)
@@ -57,11 +57,11 @@ module.exports.check_can_review = async (req, res) => {
         if (!completedOrders || completedOrders.length === 0) {
             return res.json({ 
                 canReview: false, 
-                message: "Bạn cần mua sản phẩm và nhận hàng thành công trước khi đánh giá" 
+                message: "Bạn cần mua Product và nhận hàng thành công trước khi Rating" 
             })
         }
 
-        // Kiểm tra xem người dùng đã mua sản phẩm này chưa
+        // Kiểm tra xem User đã mua Product này chưa
         let hasPurchased = false
         const productIdStr = id_product.toString();
         
@@ -94,21 +94,21 @@ module.exports.check_can_review = async (req, res) => {
             console.log('User has not purchased this product');
             return res.json({ 
                 canReview: false, 
-                message: "Bạn cần mua sản phẩm này và nhận hàng thành công trước khi đánh giá" 
+                message: "Bạn cần mua Product này và nhận hàng thành công trước khi Rating" 
             })
         }
 
         console.log('User can review this product');
-        // Người dùng có thể đánh giá
+        // User có thể Rating
         res.json({ 
             canReview: true, 
-            message: "Bạn có thể đánh giá sản phẩm này" 
+            message: "Bạn có thể Rating Product này" 
         })
     } catch (error) {
         console.error('Error in check_can_review:', error)
         res.status(500).json({ 
             canReview: false, 
-            message: "Đã xảy ra lỗi khi kiểm tra quyền đánh giá" 
+            message: "Đã xảy ra lỗi khi kiểm tra quyền Rating" 
         })
     }
 }
@@ -128,7 +128,7 @@ module.exports.post_comment = async (req, res) => {
             });
         }
 
-        // Kiểm tra xem người dùng đã đánh giá sản phẩm này chưa
+        // Kiểm tra xem User đã Rating Product này chưa
         const existingComment = await Comment.findOne({ 
             id_product: id_product,
             id_user: id_user
@@ -137,11 +137,11 @@ module.exports.post_comment = async (req, res) => {
         if (existingComment) {
             return res.status(400).json({ 
                 success: false, 
-                message: "Bạn đã đánh giá sản phẩm này rồi" 
+                message: "Bạn đã Rating Product này rồi" 
             })
         }
 
-        // Tìm tất cả đơn hàng đã hoàn thành của người dùng
+        // Tìm tất cả đơn hàng đã hoàn thành của User
         const completedOrders = await Order.find({ 
             id_user: id_user,
             status: "4"  // Chỉ lấy đơn hàng có status = 4 (Hoàn thành)
@@ -150,11 +150,11 @@ module.exports.post_comment = async (req, res) => {
         if (!completedOrders || completedOrders.length === 0) {
             return res.status(400).json({ 
                 success: false, 
-                message: "Bạn cần mua sản phẩm và nhận hàng thành công trước khi đánh giá" 
+                message: "Bạn cần mua Product và nhận hàng thành công trước khi Rating" 
             })
         }
 
-        // Kiểm tra xem người dùng đã mua sản phẩm này chưa
+        // Kiểm tra xem User đã mua Product này chưa
         let hasPurchased = false
         const productIdStr = id_product.toString();
         
@@ -176,7 +176,7 @@ module.exports.post_comment = async (req, res) => {
         if (!hasPurchased) {
             return res.status(400).json({ 
                 success: false, 
-                message: "Bạn cần mua sản phẩm này và nhận hàng thành công trước khi đánh giá" 
+                message: "Bạn cần mua Product này và nhận hàng thành công trước khi Rating" 
             })
         }
 
@@ -192,13 +192,13 @@ module.exports.post_comment = async (req, res) => {
 
         res.json({
             success: true,
-            message: "Đánh giá của bạn đã được gửi thành công"
+            message: "Rating của bạn đã được gửi thành công"
         })
     } catch (error) {
         console.error(error)
         res.status(500).json({ 
             success: false, 
-            message: "Đã xảy ra lỗi khi gửi đánh giá" 
+            message: "Đã xảy ra lỗi khi gửi Rating" 
         })
     }
 }

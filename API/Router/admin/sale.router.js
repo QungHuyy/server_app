@@ -12,7 +12,7 @@ router.get('/:id', Sale.detail)
 
 router.patch('/:id', Sale.update)
 
-router.delete('/:id', Sale.delete) // Thêm route xóa Sale
+router.delete('/:id', Sale.delete) // Thêm route Delete Sale
 
 router.get('/list/product', Sale.list)
 

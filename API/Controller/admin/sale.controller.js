@@ -11,7 +11,7 @@ module.exports.index = async (req, res) => {
     let start = (page - 1) * perPage;
     let end = page * perPage;
 
-    // Thêm populate để lấy thông tin sản phẩm
+    // Thêm populate để lấy thông tin Product
     const sale = await Sale.find().populate('id_product');
 
     if (!keyWordSearch) {
@@ -45,7 +45,7 @@ module.exports.create = async (req, res) => {
     })
 
     if (flag){
-        res.send("Sản phẩm này đã có khuyến mãi")
+        res.send("Product này đã có khuyến mãi")
     }else{
         await Sale.create(req.body)
 

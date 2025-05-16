@@ -78,7 +78,7 @@ module.exports.update_user = async (req, res) => {
         user.fullname = req.body.fullname
         user.username = req.body.username
         
-        // Chỉ cập nhật mật khẩu nếu người dùng nhập mật khẩu mới
+        // Chỉ cập nhật mật khẩu nếu User nhập mật khẩu mới
         if (req.body.password && req.body.password !== user.password) {
             const salt = await bcrypt.genSalt(10);
             user.password = await bcrypt.hash(req.body.password, salt);

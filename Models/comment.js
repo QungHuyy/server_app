@@ -4,7 +4,7 @@ var schema = new mongoose.Schema(
     {
         id_product: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'Product'
+            ref: 'Products'
         },
         id_user: {
             type: mongoose.Schema.Types.ObjectId,

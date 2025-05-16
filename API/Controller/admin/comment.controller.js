@@ -16,19 +16,19 @@ module.exports.index = async (req, res) => {
         let start = (page - 1) * perPage
         let end = page * perPage
         
-        // Lấy danh sách comment với thông tin người dùng và sản phẩm
+        // Lấy danh sách comment với thông tin User và Product
         const comments = await Comment.find()
             .populate('id_user')
             .populate('id_product')
             .sort({ _id: -1 }) // Sắp xếp theo thời gian tạo giảm dần
-        
+       
         if (!keyWordSearch) {
             res.json({
                 comments: comments.slice(start, end),
                 totalPage: totalPage
             })
         } else {
-            // Tìm kiếm theo nội dung comment hoặc tên người dùng
+            // Tìm kiếm theo Comment comment hoặc tên User
             const filteredComments = comments.filter(comment => {
                 return (comment.content && comment.content.toLowerCase().includes(keyWordSearch.toLowerCase())) ||
                        (comment.id_user && comment.id_user.fullname && 
@@ -45,7 +45,7 @@ module.exports.index = async (req, res) => {
     } catch (error) {
         console.error('Error in admin comment index:', error)
         res.status(500).json({ 
-            message: "Đã xảy ra lỗi khi lấy danh sách đánh giá" 
+            message: "Đã xảy ra lỗi khi lấy danh sách Rating" 
         })
     }
 }
@@ -63,14 +63,14 @@ module.exports.detail = async (req, res) => {
             .populate('id_product')
         
         if (!comment) {
-            return res.status(404).json({ message: "Không tìm thấy đánh giá" })
+            return res.status(404).json({ message: "Không tìm thấy Rating" })
         }
         
         res.json(comment)
     } catch (error) {
         console.error('Error in admin comment detail:', error)
         res.status(500).json({ 
-            message: "Đã xảy ra lỗi khi lấy thông tin đánh giá" 
+            message: "Đã xảy ra lỗi khi lấy thông tin Rating" 
         })
     }
 }
@@ -86,17 +86,17 @@ module.exports.delete = async (req, res) => {
         const comment = await Comment.findByIdAndDelete(id)
         
         if (!comment) {
-            return res.status(404).json({ message: "Không tìm thấy đánh giá" })
+            return res.status(404).json({ message: "Không tìm thấy Rating" })
         }
         
         res.json({ 
-            message: "Xóa đánh giá thành công",
+            message: "Delete Rating thành công",
             success: true
         })
     } catch (error) {
         console.error('Error in admin comment delete:', error)
         res.status(500).json({ 
-            message: "Đã xảy ra lỗi khi xóa đánh giá",
+            message: "Đã xảy ra lỗi khi Delete Rating",
             success: false
         })
     }
@@ -107,16 +107,16 @@ module.exports.getUserInfo = async (req, res) => {
         const id = req.params.id
         
         if (!mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).json({ message: "ID người dùng không hợp lệ" })
+            return res.status(400).json({ message: "ID User không hợp lệ" })
         }
         
         const user = await Users.findById(id)
         
         if (!user) {
-            return res.status(404).json({ message: "Không tìm thấy thông tin người dùng" })
+            return res.status(404).json({ message: "Không tìm thấy thông tin User" })
         }
         
-        // Trả về thông tin người dùng (bao gồm email, số điện thoại)
+        // Trả về thông tin User (bao gồm email, số điện thoại)
         res.json({
             _id: user._id,
             fullname: user.fullname,
@@ -127,7 +127,7 @@ module.exports.getUserInfo = async (req, res) => {
     } catch (error) {
         console.error('Error in admin get user info:', error)
         res.status(500).json({ 
-            message: "Đã xảy ra lỗi khi lấy thông tin người dùng" 
+            message: "Đã xảy ra lỗi khi lấy thông tin User" 
         })
     }
 }

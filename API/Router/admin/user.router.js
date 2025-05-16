@@ -11,7 +11,7 @@ router.post('/login', adminLogin, User.login);
 router.get('/', User.index);
 router.get('/:id', User.details);
 
-// Giữ verifyToken cho các thao tác thay đổi dữ liệu
+// Giữ verifyToken cho các Action thay đổi dữ liệu
 router.post('/create', verifyToken, User.create);
 router.patch('/update', verifyToken, User.update);
 router.delete('/delete', User.delete);

@@ -11,7 +11,8 @@ var schema = new mongoose.Schema(
         fullname: String,
         gender: String,
         email: String,
-        phone: String
+        phone: String,
+      
 
     }
 );

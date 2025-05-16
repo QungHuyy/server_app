@@ -26,7 +26,7 @@ const sendMail = (to, subject, htmlContent) => {
         from: adminEmail, // địa chỉ admin email bạn dùng để gửi
         to: to, // địa chỉ gửi đến
         subject: subject, // Tiêu đề của mail
-        html: htmlContent // Phần nội dung mail mình sẽ dùng html thay vì thuần văn bản thông thường.
+        html: htmlContent // Phần Comment mail mình sẽ dùng html thay vì thuần văn bản thông thường.
     }
 
     // hàm transporter.sendMail() này sẽ trả về cho chúng ta một Promise
