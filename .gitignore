@@ -1,5 +1,7 @@
 # dependencies
 /node_modules
+# .gitignore
+node_modules/
 
 # environment variables
 .env
