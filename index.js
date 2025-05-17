@@ -1,12 +1,16 @@
 require('dotenv').config();
-
+const cloudinary = require("cloudinary").v2;
 const express = require('express')
 const app = express()
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 
 const cors = require("cors");
-
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME || 'dwmsfixy5',
+  api_key: process.env.CLOUDINARY_API_KEY || '716424388887474',
+  api_secret: process.env.CLOUDINARY_API_SECRET || 'Sf05WjEVfwFWFQnN1xWsfLHh0F0'
+});
 // Khởi tạo paypal
 var paypal = require('paypal-rest-sdk');
 
