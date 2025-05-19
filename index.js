@@ -24,6 +24,7 @@ const Detail_OrderAPI = require('./API/Router/detail_order.router')
 const CommentAPI = require('./API/Router/comment.router')
 const CategoryAPI = require('./API/Router/category.router')
 const NoteAPI = require('./API/Router/note.router')
+const ChatbotAPI = require('./API/Router/chatbot.router')
 
 const ProductAdmin = require('./API/Router/admin/product.router')
 const CategoryAdmin = require('./API/Router/admin/category.router')
@@ -40,7 +41,7 @@ mongoose.connect("mongodb+srv://admin:admin@app.sj5nx.mongodb.net/?retryWrites=t
   useUnifiedTopology: true
 }).then(async () => {
   console.log('Connected to database ');
-  
+
   // Tự động tạo quyền Admin nếu chưa tồn tại
   try {
     const Permission = require('./Models/permission');
@@ -82,6 +83,7 @@ app.use('/api/Comment', CommentAPI)
 app.use('/api/Note', NoteAPI)
 app.use('/api/DetailOrder', Detail_OrderAPI)
 app.use('/api/Category', CategoryAPI)
+app.use('/api/Chatbot', ChatbotAPI)
 
 app.use('/api/admin/Product', ProductAdmin)
 app.use('/api/admin/Category', CategoryAdmin)
