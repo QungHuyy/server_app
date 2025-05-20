@@ -35,7 +35,7 @@ module.exports.index = async (req, res) => {
         totalMoney: money
     })
 
-   
+
 }
 
 module.exports.detailOrder = async (req, res) => {
@@ -87,16 +87,16 @@ module.exports.confirmOrder = async (req, res) => {
 
 // module.exports.delivery = async (req, res) => {
 //     await Order.updateOne({ _id: req.query.id }, { status: "3" },async function (err, res) {
-      
-        
-//         const DetailOrder = await Detail_Order.findOne({id_order: req.query.id}) 
+
+
+//         const DetailOrder = await Detail_Order.findOne({id_order: req.query.id})
 //         const  inventory= DetailOrder.inventory
 //        console.log(inventory);
-       
+
 
 //         if (err) return res.json({ msg: err });
 //     });
-  
+
 //     res.json({ msg: "Thanh Cong" })
 // }
 module.exports.delivery = async (req, res) => {
@@ -157,46 +157,66 @@ module.exports.completeOrder = async (req, res) => {
     let money = 0;
 
     const getDate = req.query.getDate
+    const productId = req.query.productId
 
     const perPage = parseInt(req.query.limit) || 8;
 
     let start = (page - 1) * perPage;
     let end = page * perPage;
 
+    // Lấy tất cả đơn hàng đã hoàn thành
     const orders = await (await Order.find({ status: '4' }).populate('id_user').populate('id_payment').populate('id_note')).reverse();
 
-    if(!getDate){
-
-        const totalPage = Math.ceil(orders.length / perPage);
-
-        orders.map((value) => {
-            money += Number(value.total);
-        })
-
-        res.json({
-            orders: orders.slice(start, end),
-            totalPage: totalPage,
-            totalMoney: money
-        })
-
-    }else{
-
-        const newOrder = orders.filter(value => {
+    // Lọc đơn hàng theo ngày nếu có
+    let filteredOrders = orders;
+    if (getDate) {
+        filteredOrders = orders.filter(value => {
             return value.create_time.toString().indexOf(getDate.toString()) !== -1
-        })
-
-        const totalPage = Math.ceil(newOrder.length / perPage);
-
-        newOrder.map((value) => {
-            money += Number(value.total);
-        })
-
-        res.json({
-            orders: newOrder.slice(start, end),
-            totalPage: totalPage,
-            totalMoney: money
-        })
-
+        });
     }
+
+    // Nếu có lọc theo sản phẩm
+    if (productId) {
+        // Lấy tất cả chi tiết đơn hàng có chứa sản phẩm được chọn
+        const orderDetailsWithProduct = await Detail_Order.find({
+            id_product: productId
+        });
+
+        // Lấy danh sách ID đơn hàng có chứa sản phẩm
+        const orderIdsWithProduct = orderDetailsWithProduct.map(detail => detail.id_order);
+
+        // Lọc đơn hàng theo ID
+        filteredOrders = filteredOrders.filter(order =>
+            orderIdsWithProduct.includes(order._id.toString())
+        );
+    }
+
+    // Lấy thông tin chi tiết sản phẩm cho mỗi đơn hàng
+    const ordersWithProductDetails = [];
+    for (const order of filteredOrders) {
+        // Lấy chi tiết đơn hàng
+        const orderDetails = await Detail_Order.find({ id_order: order._id.toString() }).populate('id_product');
+
+        // Tạo một bản sao của đơn hàng để thêm thông tin sản phẩm
+        const orderWithProducts = order.toObject();
+
+        // Thêm thông tin sản phẩm vào đơn hàng
+        orderWithProducts.productDetails = orderDetails;
+
+        ordersWithProductDetails.push(orderWithProducts);
+    }
+
+    // Tính tổng tiền
+    ordersWithProductDetails.forEach(value => {
+        money += Number(value.total);
+    });
+
+    const totalPage = Math.ceil(ordersWithProductDetails.length / perPage);
+
+    res.json({
+        orders: ordersWithProductDetails.slice(start, end),
+        totalPage: totalPage,
+        totalMoney: money
+    });
 
 }
